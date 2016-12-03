@@ -25,10 +25,12 @@ void setup() {
   for (int thisReading = 0; thisReading < numReadings; thisReading++) {
     readings[thisReading] = 0;
   }
-  pinMode(10, OUTPUT);
+  //pinMode(10, OUTPUT);
+  pinMode(LED_BUILTIN, OUTPUT);
 }
 
 void loop() {
+  /*
   ledtime = ledtime + 1;
   ledduty = ledduty + 1;
   // subtract the last reading:
@@ -76,4 +78,39 @@ void loop() {
     digitalWrite(10,templed);
   }*/
  
+
+ //test blink
+ //bins: 40 per 100PSI, 3000 PSI max => 1200
+ digitalWrite(LED_BUILTIN, HIGH);
+ delay(3000); //just to know we've started a new loop
+ 
+ 
+ for(int average = 10; average < 1200; average+=40){
+  Serial.print("Here is average: "); //fine
+  Serial.println(average);
+
+  set_blink(average, 5);
+ }
+ Serial.println("done!");
+}
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void set_blink(int reading, int seconds_run){
+  //reading is an integer where min = 0; max = 1200
+  int this_hertz = reading/40 + 1;
+  int half_cycle = calc_half_cycle_ms(this_hertz);
+
+  //cycle by second
+  for(int cycle = 0; cycle < (this_hertz * seconds_run); cycle++){
+     digitalWrite(LED_BUILTIN, HIGH);
+     delay(half_cycle);
+     digitalWrite(LED_BUILTIN, LOW);
+     delay(half_cycle);
+  }
+}
+
+int calc_half_cycle_ms(int desired_hertz){
+  double cycle_sec = 1.0/desired_hertz;  //ex: 
+  double cycle_ms = cycle_sec * 1000;
+  //return half cycle time
+  return (int)(cycle_ms/2);
 }
