@@ -8,11 +8,11 @@ Timer outer_t;
 Timer blink_t;
 
 // the setup routine runs once when you press reset:
-const int numReadings = 10;
+const int numReadings = 200;
 
 int readings[numReadings];      // the readings from the analog input
 int readIndex = 0;              // the index of the current reading                  // the running total
-int average;                // the average
+long average;                // the average
 
 int inputPin = A0;
 
@@ -87,6 +87,7 @@ void loop() {
  set_blink(3);
  inner_t.update(); 
  outer_t.update();
+
  
 }
 
@@ -95,6 +96,9 @@ void loop() {
 *****************************************************************************/
 void take_measurement(){
    readings[readIndex] = analogRead(inputPin);
+   Serial.print(" ");
+   Serial.print( readings[readIndex]);
+   Serial.print(" ");
     readIndex += 1;
    //if readIndex is over numReadings, then let's set to 0
    if (readIndex >= numReadings) {
@@ -103,23 +107,24 @@ void take_measurement(){
 }
 
 void calc_average_and_hertz(){
-  int total = 0;
+  long int total = 0;
   for(int i = 0; i < numReadings; i ++){
-    if(readings[i] == 0){
+    if(readings[i] <= 0){
       Serial.print(0);
     }
     total += readings[i];
   }
-  average = (int)total/numReadings;
+  average = total/numReadings;
+  
   //set current_hertz
   double new_hertz = ((average/bin_range) > 0) ? ((average/bin_range) + 1) : 0 ;
   current_hertz = new_hertz;
   calc_half_cycle_ms();
     Serial.print("here is the current average ");
     Serial.println(average);
-    Serial.print("and here is what the sensor gives me ");
-    Serial.println(analogRead(inputPin));
-    Serial.println(' ');
+    //Serial.print("and here is what the sensor gives me ");
+    //Serial.println(analogRead(inputPin));
+    //Serial.println(' ');
     
     if (current_hertz > 0){
       Serial.print("here is half_cycle time ");
@@ -204,9 +209,6 @@ void set_blink(int seconds_run){
   }
 }
 
-void check_pulse(int seconds){
-  //int pulseEvent = blink_t.every(seconds, set_blink);
-}
 
 /*****************************************************************************
   //Human GUI functions
