@@ -8,7 +8,7 @@ Timer outer_t;
 Timer blink_t;
 
 // the setup routine runs once when you press reset:
-const int numReadings = 1;
+const int numReadings = 10;
 
 int readings[numReadings];      // the readings from the analog input
 int readIndex = 0;              // the index of the current reading                  // the running total
@@ -27,6 +27,7 @@ double current_hertz;
 
 //for the bins
 double bin_range;
+
 
 void setup() {
   /*****************************************************************************
@@ -83,7 +84,7 @@ void setup() {
 }
 
 void loop() { 
- set_blink(1);
+ set_blink(3);
  inner_t.update(); 
  outer_t.update();
  
@@ -121,7 +122,7 @@ void calc_average_and_hertz(){
     Serial.println(' ');
     
     if (current_hertz > 0){
-      Serial.print("here is half_cycle time");
+      Serial.print("here is half_cycle time ");
       Serial.println(half_cycle_ms);
       //change pulse
       //set_blink(1);
@@ -167,9 +168,6 @@ void calc_bins(){
   double desired_max_hertz_db = (double) desired_max_hertz;
   //bin_range = ((double) max_input)/(double)desired_max_hertz); //maximum 30 hertz range in blinker output
   bin_range = max_input_db/desired_max_hertz_db;
-  Serial.print("Bin range as double");
-  //Serial.println(max_input/desired_max_hertz);
-  //Serial.print("Bin range as int");
   Serial.print(bin_range);
 }
 
@@ -192,7 +190,6 @@ void set_average(int seconds){
 //take a measurement every millisecond
 void record_measurement(int milliseconds){
   Serial.println("Recording measurements ");
-  Serial.print("First measurement: ");
   Serial.println(analogRead(inputPin));
   int tickEvent = inner_t.every(milliseconds, take_measurement);
 }
@@ -200,10 +197,10 @@ void record_measurement(int milliseconds){
 void set_blink(int seconds_run){
   //cycle by second
   for(int cycle = 0; cycle < (current_hertz * seconds_run); cycle++){
-     digitalWrite(LED_BUILTIN, HIGH);
-     delay(half_cycle_ms);
-     digitalWrite(LED_BUILTIN, LOW);
-     delay(half_cycle_ms);
+    digitalWrite(LED_BUILTIN, HIGH);
+    delay(half_cycle_ms);
+    digitalWrite(LED_BUILTIN, LOW);
+    delay(half_cycle_ms);
   }
 }
 
